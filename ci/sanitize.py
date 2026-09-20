@@ -6,14 +6,16 @@ JSON + summary.json + summary.md to --out.
 
 Two layers of defense:
 
-1. ALLOWLIST — only explicitly permitted report fields survive:
-   timestamps, durations, counters, backend attribution
-   (legacy/fastapi), HTTP status, latency, overlap/outage metrics,
-   generic error classes, DB row counts, integrity verdicts, source
-   SHA and run id.
+1. ALLOWLIST — only explicitly permitted report fields survive, and
+   the raw traffic `timeline` is NEVER published: it is unbounded in
+   size, would bloat git history forever, and widens the public
+   information surface. Bounded aggregates (slow_requests,
+   failures_outside_windows) are capped; full timelines stay in the
+   ephemeral runner workspace / private diagnostics only.
 2. SECRET SCAN — the final serialized output is grepped for
-   forbidden header names, token values, env-var names and private
-   key material. ANY hit fails the process BEFORE anything is pushed.
+   forbidden header names, token values/prefixes, env-var names and
+   private key material. ANY hit fails the process BEFORE anything
+   is pushed; only the RULE NAME is printed, never the match.
 """
 import argparse
 import json
@@ -22,11 +24,11 @@ import sys
 import time
 from pathlib import Path
 
-# top-level report keys that may be published
+# top-level report keys that may be published — an exact field
+# allowlist; anything not listed is dropped (timeline included).
 ALLOWED = {
-    "mode", "legs", "run_tag",
+    "mode", "legs",
     "counters", "backend_counts", "errors", "slow_requests",
-    "timeline",
     "switch_window_transport_events", "failures_outside_windows",
     "cross_boundary_request_count",
     "inflight_stall_max_s", "inflight_stall_p95_s",
@@ -37,20 +39,35 @@ ALLOWED = {
     "run_media_rows", "run_media_distinct",
 }
 
-# forbidden content — scanned on the FINAL serialized artifacts,
+# bounded list fields — cap entries so public artifacts stay small
+BOUNDED = {"errors": 50, "slow_requests": 50,
+           "failures_outside_windows": 50}
+
+# forbidden literals — scanned on the FINAL serialized artifacts,
 # not just the raw input, so nothing can slip through a transform
 FORBIDDEN = [
-    "Authorization", "Bearer", "X-Device-Key", "X-Oss-Security-Token",
+    "Authorization", "Bearer", "Cookie", "Set-Cookie",
+    "X-Device-Key", "X-Oss-Security-Token", "X-Device-Id",
     "DEVICE_CREDENTIAL_SECRET", "OPENVEND_READ_TOKEN",
     "OPENVEND_READ_DEPLOY_KEY", "ADMIN_TOKEN", "GITHUB_TOKEN",
     "BEGIN PRIVATE KEY", "BEGIN RSA PRIVATE KEY", "BEGIN OPENSSH",
     "bootstrap_key", "rehearsal-admin-token",
     "rehearsal-device-secret", "mqtt_generation",
-    "X-Device-Id",
 ]
+
+# forbidden patterns — named so a hit reports the RULE, never the
+# matched secret material
 FORBIDDEN_RE = re.compile(
-    r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----|"
-    r"ssh-ed25519 |ssh-rsa |AKIA[0-9A-Z]{16}")
+    r"(?P<pem_private_key>-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----)"
+    r"|(?P<openssh_private_key>-----BEGIN OPENSSH PRIVATE KEY-----)"
+    r"|(?P<github_pat>github_pat_[A-Za-z0-9_]{20,})"
+    r"|(?P<ghp_token>ghp_[A-Za-z0-9]{20,})"
+    r"|(?P<ghs_token>ghs_[A-Za-z0-9]{20,})"
+    r"|(?P<gho_token>gho_[A-Za-z0-9]{20,})"
+    r"|(?P<ghu_token>ghu_[A-Za-z0-9]{20,})"
+    r"|(?P<ghr_token>ghr_[A-Za-z0-9]{20,})"
+    r"|(?P<aws_access_key>AKIA[0-9A-Z]{16})"
+    r"|(?P<ssh_private_blob>ssh-ed25519 AAAAC3|ssh-rsa AAAAB3)")
 
 
 def _strip_exc_args(s):
@@ -63,13 +80,16 @@ def _strip_exc_args(s):
 
 def sanitize_report(raw):
     out = {k: raw[k] for k in raw if k in ALLOWED}
+    for key, cap in BOUNDED.items():
+        if isinstance(out.get(key), list):
+            out[key] = out[key][:cap]
     out["errors"] = [_strip_exc_args(e)
-                     for e in raw.get("errors", [])]
-    gf = raw.get("gate_failure")
+                     for e in out.get("errors", [])]
+    gf = out.get("gate_failure")
     if isinstance(gf, dict):
         gf = dict(gf)
         gf["failures"] = [_strip_exc_args(f)
-                          for f in gf.get("failures", [])]
+                          for f in gf.get("failures", [])][:20]
         out["gate_failure"] = gf
     return out
 
@@ -77,10 +97,9 @@ def sanitize_report(raw):
 def scan(path):
     text = path.read_text(encoding="utf-8", errors="replace")
     hits = [t for t in FORBIDDEN if t in text]
-    m = FORBIDDEN_RE.search(text)
-    if m:
-        hits.append(m.group(0))
-    return hits
+    for m in FORBIDDEN_RE.finditer(text):
+        hits.append(m.lastgroup)
+    return sorted(set(hits))
 
 
 def run_row(name, rep):
@@ -186,7 +205,8 @@ def main():
             md.append("| %s | %s | (no report) |||||||||"
                       % (name, code))
     md += ["", "_sanitized by ci/sanitize.py — allowlisted fields "
-               "only, secret-scanned before publication_"]
+               "only, no raw timeline, secret-scanned before "
+               "publication_"]
     (outdir / "summary.md").write_text("\n".join(md) + "\n")
 
     # secret gate — scan EVERYTHING that would be published
@@ -197,7 +217,7 @@ def main():
             bad.append((f.name, hits))
     if bad:
         for name, hits in bad:
-            print("SANITIZER BLOCKED %s: %s" % (name, hits),
+            print("SANITIZER BLOCKED %s — rules: %s" % (name, hits),
                   file=sys.stderr)
         sys.exit(1)
     print("sanitized %d reports, verdict=%s" % (len(reports), overall))
