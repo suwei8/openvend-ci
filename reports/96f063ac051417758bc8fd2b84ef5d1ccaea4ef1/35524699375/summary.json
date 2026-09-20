@@ -1,0 +1,120 @@
+{
+ "generated_at": 1789924318,
+ "run_id": "35524699375",
+ "run_url": "https://github.com/suwei8/openvend-ci/actions/runs/35524699375",
+ "runs": {
+  "injection-soft": {
+   "cross": null,
+   "gate_failure": {
+    "auto_rollback_to": "legacy",
+    "failures": [
+     "health transport RemoteDisconnected",
+     "read /api/v1/devices transport RemoteDisconnected",
+     "read /api/v1/orders transport RemoteDisconnected",
+     "read /api/v1/stats/dashboard transport RemoteDisconnected",
+     "deviceAuthAlive transport RemoteDisconnected",
+     "media PUT transport RemoteDisconnected"
+    ],
+    "leg": "forward",
+    "rollback_recovered": true
+   },
+   "integrity": true,
+   "media_distinct": 4,
+   "media_rows": 4,
+   "outage_f": null,
+   "outage_r": null,
+   "run": "injection-soft",
+   "stall_max": null,
+   "stall_p95": null,
+   "transport_events": null,
+   "uploads": 4,
+   "wo_f": null,
+   "wo_r": "leg not reached"
+  },
+  "injection-stopfirst": {
+   "cross": null,
+   "gate_failure": {
+    "auto_rollback_to": "legacy",
+    "failures": [
+     "health transport RemoteDisconnected",
+     "read /api/v1/devices transport RemoteDisconnected",
+     "read /api/v1/orders transport RemoteDisconnected",
+     "read /api/v1/stats/dashboard transport RemoteDisconnected",
+     "deviceAuthAlive transport RemoteDisconnected",
+     "media PUT transport RemoteDisconnected"
+    ],
+    "leg": "forward",
+    "rollback_recovered": true
+   },
+   "integrity": true,
+   "media_distinct": 4,
+   "media_rows": 4,
+   "outage_f": null,
+   "outage_r": null,
+   "run": "injection-stopfirst",
+   "stall_max": null,
+   "stall_p95": null,
+   "transport_events": null,
+   "uploads": 4,
+   "wo_f": null,
+   "wo_r": "leg not reached"
+  },
+  "soft": {
+   "cross": 38,
+   "gate_failure": null,
+   "integrity": true,
+   "media_distinct": 963,
+   "media_rows": 963,
+   "outage_f": 0.03,
+   "outage_r": 0.03,
+   "run": "soft",
+   "stall_max": 30.717,
+   "stall_p95": 30.716,
+   "transport_events": 0,
+   "uploads": 963,
+   "wo_f": 0.0,
+   "wo_r": 9.176
+  },
+  "soft-wst": {
+   "cross": 32,
+   "gate_failure": null,
+   "integrity": true,
+   "media_distinct": 20,
+   "media_rows": 20,
+   "outage_f": 0.029,
+   "outage_r": 0.029,
+   "run": "soft-wst",
+   "stall_max": 31.619,
+   "stall_p95": 31.616,
+   "transport_events": 0,
+   "uploads": 20,
+   "wo_f": null,
+   "wo_r": 0.0
+  },
+  "stopfirst": {
+   "cross": 43,
+   "gate_failure": null,
+   "integrity": true,
+   "media_distinct": 108,
+   "media_rows": 108,
+   "outage_f": 10.149,
+   "outage_r": 10.326,
+   "run": "stopfirst",
+   "stall_max": 30.609,
+   "stall_p95": 30.541,
+   "transport_events": 128,
+   "uploads": 108,
+   "wo_f": 0.0,
+   "wo_r": 0.0
+  }
+ },
+ "source_sha": "96f063ac051417758bc8fd2b84ef5d1ccaea4ef1",
+ "verdict": "PASS",
+ "verdicts": {
+  "injection-soft": "0",
+  "injection-stopfirst": "0",
+  "soft": "0",
+  "soft-wst": "0",
+  "stopfirst": "0"
+ }
+}
