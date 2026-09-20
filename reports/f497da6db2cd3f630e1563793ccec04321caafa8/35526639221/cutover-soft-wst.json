@@ -1,0 +1,147 @@
+{
+ "backend_counts": {
+  "heartbeat|legacy": 100,
+  "read:/api/v1/devices|legacy": 2,
+  "read:/api/v1/orders|legacy": 2,
+  "read:/api/v1/stats/dashboard|legacy": 4,
+  "upload|fastapi": 137,
+  "upload|legacy": 20
+ },
+ "counters": {
+  "heartbeat.200": 100,
+  "read:/api/v1/devices.200": 2,
+  "read:/api/v1/orders.200": 2,
+  "read:/api/v1/stats/dashboard.200": 4,
+  "upload.200": 157
+ },
+ "cross_boundary_request_count": 33,
+ "errors": [],
+ "failures_outside_windows": [],
+ "fresh_connection_outage_s": {
+  "forward": 0.031,
+  "rollback": 0.031
+ },
+ "inflight_stall_max_s": 31.495,
+ "inflight_stall_p95_s": 31.478,
+ "integrity_after": true,
+ "legs": [
+  {
+   "drain_observed_s": 2.354,
+   "failures_during_switch": 0,
+   "first_new_ok": 1789926225.832,
+   "last_old_ok": 1789926225.802,
+   "leg": "forward",
+   "outage_s": 0.031,
+   "overlap_s": 0.0,
+   "residual_old_count": 0,
+   "residual_old_span_s": 0.0,
+   "t_action": 1789926225.667,
+   "to": "fastapi",
+   "window_end": 1789926228.0206392
+  },
+  {
+   "drain_observed_s": 5.28,
+   "failures_during_switch": 0,
+   "first_new_ok": 1789926252.919,
+   "last_old_ok": 1789926252.888,
+   "leg": "rollback",
+   "outage_s": 0.031,
+   "overlap_s": 0.0,
+   "residual_old_count": 0,
+   "residual_old_span_s": 0.0,
+   "t_action": 1789926252.725,
+   "to": "legacy",
+   "window_end": 1789926258.005614
+  }
+ ],
+ "media_delta_vs_upload200": [
+  159,
+  157
+ ],
+ "mode": "soft",
+ "run_media_distinct": 157,
+ "run_media_rows": 157,
+ "slow_requests": [
+  [
+   1789926223.1124918,
+   "heartbeat",
+   "legacy",
+   200,
+   31.5
+  ],
+  [
+   1789926223.1264555,
+   "heartbeat",
+   "legacy",
+   200,
+   31.48
+  ],
+  [
+   1789926223.1396222,
+   "heartbeat",
+   "legacy",
+   200,
+   31.47
+  ],
+  [
+   1789926223.1421971,
+   "heartbeat",
+   "legacy",
+   200,
+   31.46
+  ],
+  [
+   1789926223.1321137,
+   "heartbeat",
+   "legacy",
+   200,
+   31.44
+  ],
+  [
+   1789926223.1447864,
+   "heartbeat",
+   "legacy",
+   200,
+   31.43
+  ],
+  [
+   1789926283.9607205,
+   "heartbeat",
+   "legacy",
+   200,
+   30.75
+  ],
+  [
+   1789926283.9665282,
+   "heartbeat",
+   "legacy",
+   200,
+   30.74
+  ],
+  [
+   1789926283.9847918,
+   "heartbeat",
+   "legacy",
+   200,
+   30.73
+  ],
+  [
+   1789926284.017039,
+   "heartbeat",
+   "legacy",
+   200,
+   30.7
+  ]
+ ],
+ "switch_window_transport_events": 0,
+ "write_overlap_forward": {
+  "first_new_write": 1789926252.071,
+  "last_old_write_after_new": null,
+  "write_overlap_s": 0.0
+ },
+ "write_overlap_rollback": {
+  "first_new_write": 1789926252.983,
+  "last_old_write_after_new": 1789926257.867,
+  "write_overlap_s": 4.883
+ }
+}

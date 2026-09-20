@@ -1,0 +1,113 @@
+{
+ "backend_counts": {
+  "heartbeat|legacy": 20,
+  "read:/api/v1/devices|legacy": 1,
+  "read:/api/v1/stats/dashboard|legacy": 1,
+  "upload|legacy": 4
+ },
+ "counters": {
+  "heartbeat.200": 20,
+  "read:/api/v1/devices.200": 1,
+  "read:/api/v1/stats/dashboard.200": 1,
+  "upload.200": 4
+ },
+ "errors": [],
+ "gate_failure": {
+  "auto_rollback_to": "legacy",
+  "failures": [
+   "health transport RemoteDisconnected",
+   "read /api/v1/devices transport RemoteDisconnected",
+   "read /api/v1/orders transport RemoteDisconnected",
+   "read /api/v1/stats/dashboard transport RemoteDisconnected",
+   "deviceAuthAlive transport RemoteDisconnected",
+   "media PUT transport RemoteDisconnected"
+  ],
+  "leg": "forward",
+  "rollback_recovered": true
+ },
+ "integrity_after": true,
+ "legs": [],
+ "media_delta_vs_upload200": [
+  4,
+  4
+ ],
+ "mode": "stop-first",
+ "run_media_distinct": 4,
+ "run_media_rows": 4,
+ "slow_requests": [
+  [
+   1789926451.4658916,
+   "heartbeat",
+   "legacy",
+   200,
+   30.58
+  ],
+  [
+   1789926451.4669154,
+   "heartbeat",
+   "legacy",
+   200,
+   30.57
+  ],
+  [
+   1789926451.4635968,
+   "heartbeat",
+   "legacy",
+   200,
+   30.55
+  ],
+  [
+   1789926451.468312,
+   "heartbeat",
+   "legacy",
+   200,
+   30.55
+  ],
+  [
+   1789926451.4716542,
+   "heartbeat",
+   "legacy",
+   200,
+   30.55
+  ],
+  [
+   1789926450.0021086,
+   "upload",
+   "legacy",
+   200,
+   30.35
+  ],
+  [
+   1789926450.0134835,
+   "read:/api/v1/devices",
+   "legacy",
+   200,
+   30.33
+  ],
+  [
+   1789926450.0330257,
+   "upload",
+   "legacy",
+   200,
+   30.32
+  ],
+  [
+   1789926451.4586177,
+   "heartbeat",
+   "legacy",
+   200,
+   30.13
+  ],
+  [
+   1789926451.4581792,
+   "heartbeat",
+   "legacy",
+   200,
+   30.13
+  ]
+ ],
+ "write_overlap_forward": {
+  "error": "no fastapi write observed"
+ },
+ "write_overlap_rollback": "leg not reached"
+}
