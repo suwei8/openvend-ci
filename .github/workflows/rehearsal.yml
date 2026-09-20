@@ -155,7 +155,9 @@ jobs:
       # the point is collecting ALL the A/B data; the aggregate
       # verdict step fails the job if any run did.
       - name: Init verdict ledger
-        run: mkdir -p "$OUT" && : > "$OUT/verdicts.env"
+        run: |
+          mkdir -p "$OUT"
+          : > "$OUT/verdicts.env"
 
       - name: Cutover rehearsal — soft reload
         run: |
@@ -247,15 +249,13 @@ jobs:
             --in "$OUT" --out sanitized \
             --source-sha "$SOURCE_SHA" \
             --run-id "$GITHUB_RUN_ID" \
-            --run-url \
-"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           cat sanitized/summary.md >> "$GITHUB_STEP_SUMMARY"
         if: always()
 
       - name: Publish sanitized reports to reports branch
         run: |
-          git clone --quiet \
-"https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+          git clone --quiet "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
             reports-out
           cd reports-out
           if git fetch origin reports:reports 2>/dev/null; then
