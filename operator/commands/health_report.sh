@@ -1,20 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-/tmp/openvend-health-summary.md}"
+
 section() {
-  echo "## $1" >> "$GITHUB_STEP_SUMMARY"
+  local title="$1"
+  echo "## ${title}" | tee -a "$SUMMARY_FILE"
 }
 
 run_cmd() {
-  echo '```' >> "$GITHUB_STEP_SUMMARY"
-  "$@" >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
-  echo '```' >> "$GITHUB_STEP_SUMMARY"
+  echo '```' | tee -a "$SUMMARY_FILE"
+  "$@" 2>&1 | tee -a "$SUMMARY_FILE" || true
+  echo '```' | tee -a "$SUMMARY_FILE"
 }
 
-: > "$GITHUB_STEP_SUMMARY"
+: > "$SUMMARY_FILE"
 
-echo "# OpenVend OCI Health Report" >> "$GITHUB_STEP_SUMMARY"
-echo "Generated: $(date -u)" >> "$GITHUB_STEP_SUMMARY"
+printf '# OpenVend OCI Health Report\n' | tee -a "$SUMMARY_FILE"
+printf 'Generated: %s\n\n' "$(date -u)" | tee -a "$SUMMARY_FILE"
+
+echo "Starting readonly health check..."
 
 section "Host"
 run_cmd hostname
@@ -33,4 +38,4 @@ run_cmd docker compose ls
 section "Runtime Ports"
 run_cmd bash -c 'ss -tlnp || true'
 
-echo "\nReadonly health report completed." >> "$GITHUB_STEP_SUMMARY"
+echo "Readonly health report completed." | tee -a "$SUMMARY_FILE"
