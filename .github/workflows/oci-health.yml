@@ -10,7 +10,7 @@ jobs:
       - self-hosted
       - Linux
       - ARM64
-      - oci
+
     permissions:
       contents: read
 
