@@ -17,6 +17,7 @@ on:
           - backup-preflight
           - backup-verify
           - db-integrity
+          - console
 
 jobs:
   operator:
@@ -40,5 +41,6 @@ jobs:
             backup-preflight) bash operator/backup_preflight.sh ;;
             backup-verify) bash operator/backup_verify.sh ;;
             db-integrity) bash operator/db_integrity_check.sh ;;
+            console) bash operator/console_check.sh ;;
             *) echo 'unknown action'; exit 1 ;;
           esac
