@@ -19,6 +19,8 @@ on:
           - db-integrity
           - console
           - cutover-preflight
+          - runtime-snapshot
+          - preflight-report
 
 jobs:
   operator:
@@ -44,5 +46,7 @@ jobs:
             db-integrity) bash operator/db_integrity_check.sh ;;
             console) bash operator/console_check.sh ;;
             cutover-preflight) bash operator/cutover_preflight.sh ;;
+            runtime-snapshot) bash operator/runtime_snapshot.sh ;;
+            preflight-report) bash operator/preflight_report.sh ;;
             *) echo 'unknown action'; exit 1 ;;
           esac
