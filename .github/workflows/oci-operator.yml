@@ -1,0 +1,39 @@
+name: OCI Operator
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Operator action
+        required: true
+        default: health
+        type: choice
+        options:
+          - health
+          - status
+
+jobs:
+  operator:
+    runs-on: [self-hosted, Linux, ARM64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Execute operator command
+        shell: bash
+        run: |
+          set -euo pipefail
+          case '${{ inputs.action }}' in
+            health)
+              bash operator/health_report.sh
+              ;;
+            status)
+              bash operator/status.sh
+              ;;
+            *)
+              echo 'unknown action'
+              exit 1
+              ;;
+          esac
