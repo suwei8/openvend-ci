@@ -1,0 +1,25 @@
+name: OCI Health Report
+
+on:
+  workflow_dispatch:
+
+jobs:
+  health:
+    name: OCI readonly health report
+    runs-on:
+      - self-hosted
+      - Linux
+      - ARM64
+      - oci
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run health report
+        shell: bash
+        run: |
+          chmod +x operator/commands/health_report.sh
+          operator/commands/health_report.sh
