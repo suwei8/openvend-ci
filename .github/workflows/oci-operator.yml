@@ -14,6 +14,9 @@ on:
           - compose
           - nginx
           - docker
+          - backup-preflight
+          - backup-verify
+          - db-integrity
 
 jobs:
   operator:
@@ -29,23 +32,13 @@ jobs:
         run: |
           set -euo pipefail
           case '${{ inputs.action }}' in
-            health)
-              bash operator/health_report.sh
-              ;;
-            status)
-              bash operator/status.sh
-              ;;
-            compose)
-              bash operator/compose_status.sh
-              ;;
-            nginx)
-              bash operator/nginx_check.sh
-              ;;
-            docker)
-              bash operator/docker_health.sh
-              ;;
-            *)
-              echo 'unknown action'
-              exit 1
-              ;;
+            health) bash operator/health_report.sh ;;
+            status) bash operator/status.sh ;;
+            compose) bash operator/compose_status.sh ;;
+            nginx) bash operator/nginx_check.sh ;;
+            docker) bash operator/docker_health.sh ;;
+            backup-preflight) bash operator/backup_preflight.sh ;;
+            backup-verify) bash operator/backup_verify.sh ;;
+            db-integrity) bash operator/db_integrity_check.sh ;;
+            *) echo 'unknown action'; exit 1 ;;
           esac
