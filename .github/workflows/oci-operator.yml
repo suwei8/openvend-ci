@@ -18,6 +18,7 @@ on:
           - backup-verify
           - db-integrity
           - console
+          - cutover-preflight
 
 jobs:
   operator:
@@ -42,5 +43,6 @@ jobs:
             backup-verify) bash operator/backup_verify.sh ;;
             db-integrity) bash operator/db_integrity_check.sh ;;
             console) bash operator/console_check.sh ;;
+            cutover-preflight) bash operator/cutover_preflight.sh ;;
             *) echo 'unknown action'; exit 1 ;;
           esac
