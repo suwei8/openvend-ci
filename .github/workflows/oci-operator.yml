@@ -1,0 +1,83 @@
+name: OCI Operator
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "Operator command"
+        required: true
+        default: status
+        type: choice
+        options:
+          - status
+          - health
+          - logs
+
+permissions:
+  contents: read
+
+jobs:
+  operator:
+    runs-on:
+      - self-hosted
+      - Linux
+      - ARM64
+      - oci
+
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout operator definitions
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      - name: Execute OCI operator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p operator-output
+
+          case "${{ inputs.command }}" in
+            status)
+              {
+                echo "## OCI Status Report"
+                echo
+                echo "Host: $(hostname)"
+                echo
+                echo "### Docker"
+                docker version --format '{{.Server.Version}}' || true
+                echo
+                echo "### Containers"
+                docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+                echo
+                echo "### Disk"
+                df -h /
+              } | tee operator-output/status.md
+              ;;
+
+            health)
+              {
+                echo "## OCI Health Report"
+                date -u
+                echo
+                curl -fsS http://127.0.0.1/api/v1/health || true
+              } | tee operator-output/health.md
+              ;;
+
+            logs)
+              {
+                echo "## OCI Logs Report"
+                docker ps --format '{{.Names}}' | while read -r c; do
+                  echo "### $c"
+                  docker logs --tail 50 "$c" 2>&1 || true
+                done
+              } | tee operator-output/logs.md
+              ;;
+          esac
+
+      - name: Publish summary
+        if: always()
+        run: |
+          cat operator-output/*.md >> "$GITHUB_STEP_SUMMARY"
